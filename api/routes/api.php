@@ -14,6 +14,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('/vehicles', 'App\Http\Controllers\VehiclesController@list');
+Route::get('/vehicles/{id}/loan-options', 'App\Http\Controllers\VehiclesController@loanOptions');
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
