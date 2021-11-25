@@ -12,7 +12,7 @@ class VehiclesController extends Controller
     }
 
     public function loanOptions(Request $request, $id) {
-        if(!$request->initialPayment)
+        if(!isset($request->initialPayment))
             return response()->json(['error' => 'The initialPayment param is required', 400]);
 
         $vehicle = Vehicle::findOrFail($id);
