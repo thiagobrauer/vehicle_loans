@@ -17,7 +17,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 COPY . /var/www
 
-COPY ./api/.env.example ./.env
+COPY ./api/.env.example /var/www/api/.env
 
 WORKDIR /var/www/api
 
@@ -25,6 +25,12 @@ RUN composer install
 
 RUN php artisan key:generate --ansi
 
+RUN php artisan config:cache
+
 RUN php artisan storage:link
 
 EXPOSE 8000
+
+COPY ./api/run.sh /tmp    
+
+ENTRYPOINT ["/tmp/run.sh"]
