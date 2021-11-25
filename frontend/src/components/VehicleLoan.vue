@@ -9,6 +9,8 @@
           :items="vehicles"
           v-model="selectedVehicle"
           label="Selecione um veículo"
+          item-text="name"
+          item-value="id"
           outlined
           clearable
           return-object
@@ -21,7 +23,6 @@
       v-if="selectedVehicle"
     >
       <v-col
-        class=""
         cols="12"
       >
         <v-row class="">
@@ -29,10 +30,10 @@
             cols="12"
             sm="6"
           >
-            <h2>Veículo selecionado</h2>
+            <h2>{{ selectedVehicle.name }}</h2>
             <h2>
               <b>R$ {{ 
-                selectedVehicle.amount.toLocaleString('pt-BR', {
+                (selectedVehicle.amount / 100).toLocaleString('pt-BR', {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2
                 })}}
@@ -52,19 +53,19 @@
 
         <v-row class="">
           <v-col
-            cols="6"
+            cols="12"
             sm="3"
           >
-            <v-text-field
-              v-model="initialPayment"
+            <v-currency-field 
+              prefix="R$"
               outlined
               clearable
-              prefix="R$"
-            ></v-text-field>
+              v-model="initialPayment"
+            />
           </v-col>
           
           <v-col
-            cols="6"
+            cols="12"
             sm="3"
           >
             <v-btn 
@@ -104,7 +105,11 @@
             cols="12"
           >
             <p v-for="option in loanOptions" v-bind:key="option.installments">
-              {{ option.installments }}x de R$ {{ option.amount }}
+              {{ option.installments }}x de R$ 
+                {{ (option.amount / 100).toLocaleString('pt-BR', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                }) }}
             </p>
           </v-col>
         </v-row>
@@ -134,32 +139,32 @@
       fetchVehiclesList: function () {
         this.loadingVehicles = true
 
-        setTimeout(() => {
-          this.vehicles = [
-            { text: 'Carro1', value: 1, amount: 12345.12 },
-            { text: 'Carro2', value: 2, amount: 12345.00 },
-            { text: 'Carro3', value: 3, amount: 12345.00 },
-          ]       
+        fetch('http://localhost:8000/api/vehicles')
+          .then(async response => {
+            if(response.ok) {
+              let data = await response.json()
+            
+              this.vehicles = data
+            }
 
-          this.loadingVehicles = false
+            this.loadingVehicles = false
+          })
 
-        }, 3000)
       },
 
       fetchLoanOptions: function () {
         this.loadingLoanOptions = true
 
-        setTimeout(() => {
-          this.loanOptions = [
-            { installments: 12, amount: 12345 },
-            { installments: 12, amount: 12345 },
-            { installments: 12, amount: 12345 },
-          ]
+        fetch(`http://localhost:8000/api/vehicles/${this.selectedVehicle.id}/loan-options?initialPayment=${parseFloat(this.initialPayment) * 100}`)
+          .then(async response => {
+            if(response.ok) {
+              let data = await response.json()
+            
+              this.loanOptions = data
+            }
 
-          this.loadingLoanOptions = false
-
-        }, 2000)
-
+            this.loadingLoanOptions = false
+          })
       }
     }
   }
