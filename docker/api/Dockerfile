@@ -33,4 +33,4 @@ EXPOSE 8000
 
 COPY ./api/run.sh /tmp    
 
-ENTRYPOINT ["/tmp/run.sh"]
+ENTRYPOINT ["sh", "/tmp/run.sh"]
