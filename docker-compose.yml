@@ -1,0 +1,51 @@
+version: '3.7'
+services:
+  api:
+    container_name: api
+    build:
+      context: ./
+      dockerfile: ./docker/api/Dockerfile
+    ports:
+      - 8000:8000
+    volumes:
+      - ./api:/var/www/api
+      - /var/www/api/vendor
+    depends_on:
+      - db
+    networks:
+      - local_network
+    command: "php artisan serve --host=0.0.0.0 --port=8000"
+
+  db:
+    container_name: db
+    build:
+      context: ./
+      dockerfile: ./docker/db/Dockerfile
+    environment:
+      MYSQL_DATABASE: vehicle_loan
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - 33066:3306
+    networks:
+      - local_network
+
+  frontend:
+    build:
+      dockerfile: ./docker/frontend/Dockerfile
+    container_name: frontend
+    volumes:
+      - ./frontend:/var/www/frontend
+      - /var/www/node_modules
+    depends_on:
+      - "api"
+    ports:
+      - 8080:8080
+    networks:
+      - local_network
+    command: "npm run serve"
+    
+networks:
+  local_network:
+    driver: bridge
