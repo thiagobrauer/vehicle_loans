@@ -30,7 +30,3 @@ RUN php artisan config:cache
 RUN php artisan storage:link
 
 EXPOSE 8000
-
-COPY ./api/run.sh /tmp    
-
-ENTRYPOINT ["sh", "/tmp/run.sh"]
